@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1 class="mt-5">ORDER DETAIL</h1>
+
+<div class="container">
+	<div class="d-flex flex-column align-items-center gap-3">
+	<div class="d-flex justify-content-center gap-3">
+		{% if order_instance.status == 'Delivered' %}
+		<h3 id="status" class="text-success">Status: {{order_instance.status}}</h3>
+		{% elif order_instance.status == 'Cancelled' %}
+		<h3 id="status" class="text-danger">Status: {{order_instance.status}}</h3>
+		{% elif order_instance.status == 'In Stand' %}
+		<h3 id="status" class="text-warning">Status: {{order_instance.status}}</h3>
+		{% else %}
+		<h3 id="status" class="text-info">Status: {{order_instance.status}}</h3>
+		{% endif %}
+		<h3>{{order_instance.updated_at|date:"j \d\e F \d\e Y \a \l\a\s H:i"}}</h3>
+	</div>
+	{% for product in products_in_order %}
+		<div class="w-100 mb-3 d-flex justify-content-center">
+			<div class="d-flex align-items-center" style="width: 100%; max-width: 800px;">
+				<div class="d-flex align-items-center mx-2">
+					<a href="{% url 'product_detail' product.product.product_name|urlencode %}" style="text-decoration: none;color: inherit;">
+						<img src="{{product.product.image_url}}" class="custom-img me-3">
+					</a>
+				</div>
+				<div class="col-4" style="min-width: 200px;">
+					<label for="product_name" class="form-label">Name</label>
+					<a href="{% url 'product_detail' product.product.product_name|urlencode %}" style="text-decoration: none;color: inherit;">
+					<p id="product_name" class="ellipsis">{{product.product.product_name}}</p>
+					</a>
+				</div>
+				<div class="col-2 text-center">
+					<label for="quantity" class="form-label">Quantity</label>
+					<p id="quantity">{{product.quantity}}</p>
+				</div>
+				<div class="col-2 text-center">
+					<label for="price" class="form-label text-center">Amount</label>
+					<p id="price">{{product.price}}</p>
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+	</div>
+	<div class="text-center">
+		<h3>Total: s/{{order_instance.total_amount}}</h1>
+	</div>
+</div>
+
+{% endblock %}

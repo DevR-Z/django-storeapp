@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+data/
+migrations/
+.env
+__init__.py
+test.sql

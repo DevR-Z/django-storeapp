@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1 class="mt-5">HISTORIAL PEDIDOS</h1>
+
+<div>
+	{% for order in orders %}
+	<div class="d-flex justify-content-center gap-3">
+		<a href="{% url 'order_detail' order.id %}" style="text-decoration: none;color: inherit;">
+			<div class="d-flex justify-content border mb-3 gap-4">
+				<div>
+					<label for="order_id" class="form-label">Id Order</label>
+					<p id="order_id">{{order.id}}</p>
+				</div>
+				<div>
+					<label for="total_amount" class="form-label">Total Amount</label>
+					<p id="total_amount">{{order.total_amount}}</p>
+				</div>
+				<div>
+					<label for="created_at" class="form-label text-center">Order Date</label>
+					<p id="created_at">{{order.created_at|date:"j/n/Y H:i"}}</p>
+				</div>
+				<div>
+					<label for="status" class="form-label">Status</label>
+					{% if order.status == 'Delivered' %}
+					<p id="status" class="text-success">{{order.status}}</p>
+					{% elif order.status == 'Cancelled' %}
+					<p id="status" class="text-danger">{{order.status}}</p>
+					{% elif order.status == 'In Stand' %}
+					<p id="status" class="text-warning">{{order.status}}</p>
+					{% else %}
+					<p id="status" class="text-info">{{order.status}}</p>
+					{% endif %}
+				</div>
+				<div>
+					<label for="updated_at" class="form-label">Last updated</label>
+					<p id="updated_at">{{order.updated_at|date:"j/n/Y H:i"}}</p>
+				</div>
+			</div>
+		</a>
+		<form method="POST">
+			{% csrf_token %}
+			{% if order.status == 'Cancelled' or order.status == 'Delivered' %}
+			<button type="button" onclick="window.location.href='{% url 'order_detail' order.id %}'" class="btn btn-secondary">Details</button>
+			{% else %}
+			<input type="hidden" name="order_id" value="{{order.id}}">
+			<input type="hidden" name="Cancelled" value="Cancelled">
+			<button class="btn btn-danger">Cancel</button>
+			{% endif %}
+		</form>
+	</div>
+	{% endfor %}
+</div>
+
+
+<!-- Modal : LISTA PRODUCTO EN CARRITO-->
+    <div class="modal fade" id="miModal" tabindex="-1" role="dialog" aria-labelledby="miModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h5 class="modal-title" id="miModalLabel">Carrito</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-dark">
+                    {% for product in products_in_cart %}
+                    	<div class="d-flex align-items-center border p-2 mb-2">
+                    		<a href="{% url 'product_detail' product.product.product_name|urlencode %}" style="text-decoration: none;color: inherit;">
+                				<img src="{{product.product.image_url}}" class="custom-img me-3">
+                			</a>
+                    		<div class="ellipsis me-auto">
+	                    		<label for="product_name" class="form-label">Nombre</label>
+	                    		<a href="{% url 'product_detail' product.product.product_name|urlencode %}" style="text-decoration: none;color: inherit;">
+		                    		<p id="product_name" class="ellipsis">{{product.product.product_name}}</p>
+		                    	</a>
+                    		</div>
+                    		<div class="d-flex ml-auto align-items-end">
+	                    		<div class="text-center">
+	                    			<form method="POST">
+	                    				{% csrf_token %}
+	                    				<input type="hidden" name="product_id" value="{{product.product.p_id}}">
+		                    			<label for="product_quantity" class="form-label">Cantidad</label>
+		                    			<input id="product_quantity" name="product_quantity" type="number" step="1" value="{{product.quantity}}" oninput="processInput(this.value)" style="width:40px;" required>
+	                    			</form>
+	                    		</div>
+	                    		<div class="text-center">
+	                    			<label for="product_price" class="form-label">Total</label>
+	                    			<p id="product_price">{{product.price}}</p>
+	                    		</div>
+	                    		<div class="ms-auto">
+	                    			<form method="POST">
+	                    				{% csrf_token %}
+	                    				<input type="hidden" name="product_id" value="{{product.product.p_id}}">
+	                    				<input type="hidden" name="remove_cart" value="remove">
+	                    				<button class="btn btn-danger">Quitar</button>
+	                    			</form>
+	                    		</div>
+                    		</div>
+                    	</div>
+                    {% endfor %}
+                </div>
+                <div class="bg-dark text-center">
+                	<h3>Total: s/{{total_amount}}<h3>
+                </div>
+                <div class="modal-footer bg-dark">
+                	<form method="POST">
+                		{% csrf_token %}
+                		<input type="hidden" name="make_order" value="make_order">
+                		<button class="btn btn-secondary">Hacer Pedido</button>
+                	</form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incluye jQuery y Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+{% endblock %}
